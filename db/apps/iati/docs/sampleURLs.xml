@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<div id="sampleURLs">
+    <h1>Sample URLs</h1>
+    <div>
+        <h2>Corpus queries</h2>
+        <div>Activities are divided into multiple <a href="/data/doc/corpus">corpus</a> collections
+            so that different transformations and subsets of ativities can be represented. These URL
+            reference activities and summaries in the 'test' corpus whihc is the current working set </div>
+        <h3>Summary data</h3>
+        <div>
+            <ul>
+                <li>
+                    <a href="/data/corpus/test">Basic data about a corpus</a>
+                </li>
+                <li>
+                    <a href="/data/corpus/test/facet/Country">A list of all Countries with Activities</a>
+                    showing overall counts and project values. The columns are sortable by clicking
+                    on a heading, so you can order by name, code, the total number of activities,
+                    the number included in the AidView interface (activity-status code 2 or 3) or
+                    total project value</li>
+                <li>
+                    <a href="/data/corpus/test/facet/Country/code/AF">A Country Summary for Afganistan</a>
+                    showing overall counts and project values. From there there we can link to
+                    related country sites via the OpenCirce site eg. </li>
+                <li>
+                    <a href="/data/corpus/test/facet/Country/code/AF/activity">A list of all Activities for
+                        which Afganistan is a participating country</a>. This list is paginated
+                    although a full list is also available (to be used with caution when there is a
+                    large number of activities). The list currently shows only the identifier and the title but other properties could be easily included. </li>
+                <li>
+                    <a href="/data/corpus/test/facet/Sector">A list of all Sectors with Activities</a>
+                    showing the same summary data as for Countries</li>
+                <li>
+                    <a href="/data/corpus/test/facet/Sector/code/11220">Summary for Primary Education (11220)</a> showing
+                    overall counts and project values. From there there is a link to multiple
+                    country links via the OpenCirce site.</li>
+                <li>Other facets currently supported are <ul>
+                        <li>
+                            <a href="/data/corpus/test/facet/SectorCategory/">Sector Category</a> a higher
+                            level grouping of Sectors</li>
+                        <li>
+                            <a href="/data/corpus/test/facet/Region">Region</a>
+                        </li>
+                        <li>
+                            <a href="/data/corpus/test/facet/Funder">Funding Organisations</a>
+                        </li>
+                        <li>
+                            <a href="/data/corpus/test/facet/Partipant">Participant Organisations</a>
+                        </li>
+                    </ul>
+                    Other facets can be added. For example the activity-status is an obvious omission as is the reporting organisation.
+                </li>
+            </ul>
+        </div>
+        <h3>Activities</h3>
+        <div>
+            <ul>
+                <li>
+                    <a href="/data/corpus/test/activity/47045-AFG-708-G04-H">Strenthening Provincial
+                        HIV Program<a/> An activity rendered to HTML</a> This representation links
+                    onwards to related activities and also to the country, funder, participants and
+                    other summary facets as well as any links in the activity itself, such as
+                    documents and websites. </li>
+                <li>
+                    <a href="/data/corpus/test/activity/47045-AFG-708-G04-H.xml">The base xml for
+                        this activity</a> together with the augmented data in the iati-ad
+                    namespace</li>
+                <li>
+                    <a href="/data/corpus/test/activity/47045-AFG-708-G04-H/profile">The validation
+                        profiles</a> available for validating this activity</li>
+                <li>
+                    <a href="/data/corpus/test/activity/47045-AFG-708-G04-H/profile/test1/errors">Validation report</a> based on the validation rules defined in the 1.0
+                    schema. </li>
+            </ul>
+        </div>
+    </div>
+    <h2>IATI general data</h2>
+    <div>Data which is independant of a corpus, such as codelists and rules</div>
+    <h3>Codelists</h3>
+    <div>
+        Versioned codelists are maintained in the database
+        <ul>
+            <li>
+                <a href="/data/codelist">List all current codelists</a>
+            </li>
+            <li>
+                <a href="/data/codelist/Country">The  current Country codelist</a>
+            </li>
+            <li>
+                <a href="/data/codelist/Country.xml">The current Country codelist as XML</a>
+            </li>
+            <li>
+                <a href="/data/codelist/Country.csv">The current Country codelist as CSV</a>
+            </li>
+            <li>
+                <a href="/data/codelist/Country/metadata">Metadata about the current Country codelist</a>
+            </li>
+            <li>
+                <a href="/data/codelist/Country/version/1.0/lang/en">a specific codelist version and language</a>
+            </li>
+            <li>
+                <a href="/data/codelist/Country/rules">The rules which reference country code</a>
+            </li>
+        </ul>
+    </div>
+    <h3>Rules and Profiles</h3>
+    <div>
+        <a href="/data/about/rulesets">Rules</a> and  <a href="/data/about/profiles">Profiles</a> are yet to be developed fully. They are use in validation and quality control</div>
+    <div>
+        <ul>
+            <li>
+                <a href="/data/profile">List of all profiles</a>
+            </li>
+            <li>
+                <a href="/data/profile/test1">Test1 Profile </a>
+            </li>
+            <li>
+                <a href="/data/ruleset">List of all Rulesets</a>
+            </li>
+            <li>
+                <a href="/data/ruleset/standard-1.0">IATI version 1 validation rules </a>
+            </li>
+            <li>
+                <a href="/data/rule/standard-1.0:2">The rule that evey activity must have a single iati-identifier</a>
+            </li>
+        </ul>
+    </div>
+</div>

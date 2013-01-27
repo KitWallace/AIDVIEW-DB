@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources name="iati-1.1-code">
+    <resource path="robots.txt">
+        <description>say no to all robots</description>
+    </resource>
+    <resource path="xquery" ignore="ignore">
+        <description>Main XQuery scripts</description>
+    </resource>
+    <resource path="xquery/data.xq">
+        <description>Public Home page</description>
+    </resource>
+    <resource path="xquery/admin.xq">
+        <description>Admin application as for data but requires login and gives access to admin
+            functions</description>
+    </resource>
+    <resource path="xquery/woapi.xq">
+        <description>API for WhiteOctober</description>
+    </resource>
+    <resource path="xquery/olap-job.xq">
+        <description>create the olap for a corpus</description>
+    </resource>
+    <resource path="xquery/ckan-job.xq">
+        <description>update the activitySets from the ckan registry</description>
+    </resource>
+    <resource path="xquery/download-job.xq">
+        <description>downlaod activities to update a corpus</description>
+    </resource>
+    <resource path="xquery/reindex-job.xq">
+        <description>reindex a corpus</description>
+    </resource>
+    <resource path="lib" ignore="ignore">
+        <description>XQuery function modules</description>
+    </resource>
+    <resource path="lib/ui.xqm">
+        <description>Main UI functions generating pages </description>
+    </resource>
+    <resource path="lib/activity.xqm">
+        <description>Functions for using rules and profiles</description>
+    </resource>
+    <resource path="lib/admin.xqm">
+        <description>Functions for admin tasks</description>
+    </resource>
+    <resource path="lib/api.xqm">
+        <description>API </description>
+    </resource>
+    <resource path="lib/codes.xqm">
+        <description>Functions for creating and accessing code lists</description>
+    </resource>
+    <resource path="lib/config.xqm">
+        <description>Application paths and configuration parameters - This needs to be updated when
+            moved since it contains paths to the data base and to the site</description>
+    </resource>
+    <resource path="lib/corpus.xqm">
+        <description>Functions for createing and accessing corpus data</description>
+    </resource>
+    <resource path="lib/jobs.xqm">
+        <description>scheduling jobs</description>
+    </resource>
+    <resource path="lib/log.xqm">
+        <description>Activity and query logging</description>
+    </resource>
+    <resource path="lib/olap.xqm">
+        <description>Functions to create and access the cached olap summaries</description>
+    </resource>
+    <resource path="lib/pipeline.xqm">
+        <description>Activity transformation pipeline functions</description>
+    </resource>
+    <resource path="lib/pipeline1.xqm">
+        <description>Compiled Activity transformation pipeline - issues with the interpreted pipeline</description>
+    </resource>
+    <resource path="lib/rss.xqm">
+        <description>RSS subscription</description>
+    </resource>
+    <resource path="lib/rules.xqm">
+        <description>Functions for using rules and profiles</description>
+    </resource>
+    <resource path="lib/sys.xqm">
+        <description>system functions like export and tests</description>
+    </resource>
+    <resource path="lib/test.xqm">
+        <description>Functions for running unit tests</description>
+    </resource>
+    <resource path="assets">
+        <description>CSS and other resources</description>
+    </resource>
+    <resource path="jscript">
+        <description>jscripts</description>
+    </resource>
+
+    <!-- configuration data  -->
+    <resource path="config" ignore="ignore">
+        <description>various system configuration files.</description>
+    </resource>
+    <resource path="config/api.xml">
+        <description>Defines the activity selection parameters and their paths into an activity -
+            used in the dynamic construction of the selection part of the API. The priority number
+            indicates the order of precedence in the computed path, which is intended to put the
+            most selective facets before the least specific, based on the counts in the cached
+            codelist.</description>
+    </resource>
+    <resource path="config/pipelines">
+        <description>Pipeline collection - tasks are executed in sequential order. Each transformation
+            takes an iati-activity in and returns a, possibly augmented, iati-activity. It is
+            intended that additional transformations using XQuery or XSLT would be able to be
+            inserted into the pipeline. Currently all tasks are defined in iati-t.xqm. Tasks may
+            have dependencies on prior tasks (eg currency conversion before computing the project
+            value before allocation in proportion) so take care if reordering. </description>
+    </resource>
+    <resource path="config/currency">
+        <description>The files for currency conversion</description>
+    </resource>
+    <resource path="config/rules">
+        <description>Rules files for validation</description>
+    </resource>
+    <resource path="config/profiles">
+        <description>Profile files for validation</description>
+    </resource>
+    <resource path="system" ignore="ignore">
+        <description>various system files. </description>
+    </resource>
+    <resource path="system/application.xml">
+        <description>The resource descriptor file (which you are reading). Describes the application
+            and its resources. Resources without @ignore will be included in the base zip
+            file.</description>
+    </resource>
+    <resource path="system/activitySet-collection.xconf">
+        <description>Index configuration for the activitySet file in a corpus: </description>
+    </resource>
+    <resource path="system/activity-collection-lucene.xconf">
+        <description>Index configuration for the activity collection in a corpus with lucene entries - the full index with Lucene full text on title and description</description>
+    </resource>
+    <resource path="system/activity-collection-batch.xconf">
+        <description>Index configuration for the activity collection in a corpus -iati-identifier and iati-ad:activitySet only for batch update </description>
+    </resource>
+    <resource path="system/olap-collection.xconf">
+        <description>Index configuration for the olap</description>
+    </resource>
+    <resource path="system/olap-config.xml">
+        <description>Default olap configuration file</description>
+    </resource>
+    <resource path="system/filesystem" ignore="ignore">
+        <description>copies of files in the file system - use the exist files with care since these files are updated between versions </description>
+    </resource>
+-   <resource path="system/filesystem/conf.xml">
+        <description>exist server configuration file moded to include required modules </description>
+    </resource>
+    <resource path="system/filesystem/log4j.xml">
+        <description>application specific log file IATI.log defined</description>
+    </resource>
+    <resource path="system/filesystem/dev.aidinfolabs.org.conf">
+        <description>apache virtual host file - t</description>
+    </resource>
+    <resource path="schemas">
+        <description>The XML Schemas defining iati-activity</description>
+    </resource>
+    <resource path="codes">
+        <description>Master code lists. Initially loaded from the IATI site but now maintained
+            here</description>
+    </resource>
+    <resource path="codes/metadata.xml" ignore="ignore">
+        <description>The index of all iati-codelists together with supporting metadata. Originally
+            from the iati standard site, this has been modified to replace the path with the more
+            useful codelist name.</description>
+    </resource>
+    <resource path="currentCodes">
+        <description>The cached current code list, which includes the scraped organisationIdentifier codes</description>
+    </resource>
+    <resource path="docs">
+        <description>documentation files</description>
+    </resource>
+    <resource path="utils">
+        <description>admin only utility scripts</description>
+    </resource>
+    <resource path="tests">
+        <description>test scripts to be executed by /db/apps/sys/runTest.xq</description>
+    </resource>
+ <!--  
+     
+     <resource path="data" ignore="ignore">
+        <description>ActivitySets, Activities and OLAP divided into separate corpuses</description>
+    </resource>
+    <resource path="data/{$corpus}" ignore="ignore">
+        <description>ActivitySets and Activities in {$corpus}</description>
+    </resource>
+    <resource path="data/{$corpus}/log.xml" ignore="ignore">
+        <description>Log of updates to activity Sets and errors in activity Transformations</description>
+    </resource>
+    <resource path="data/{$corpus}/config.xml" ignore="ignore">
+        <description>Configuration file for a corpus</description>
+    </resource>
+    <resource path="data/{$corpus}/activities" ignore="ignore">
+        <description>The collection of iati-activities</description>
+    </resource>
+    <resource path="data/{$corpus}/sets/activitySets.xml" ignore="ignore">
+        <description>The control list of all activity sets in the corpus</description>
+    </resource>
+    <resource path="data/{$corpus}/olap" ignore="ignore">
+        <description>Cached facet summary data. This data is used in the api
+            to provide fast access to facet summaries, for example for Countries. It is also used
+            for lists of actual codes present in a corpus.</description>
+    </resource>
+    <resource path="data/{$corpus}/olap/config.xml" ignore="ignore">
+        <description>The facets to be included in the olap and the data on where the data is to be located and how it is to be summarised.</description>
+    </resource>
+    <resource path="data/{$corpus}/olap/facets.xml" ignore="ignore">
+        <description>The cached summary data.</description>
+    </resource>
+    -->
+    <resource path="/db/system/config/db/apps/iati">
+        <description>All the index files</description>
+    </resource>
+    <!-- common libraries and utilities -->
+    <resource path="/db/lib/url.xqm">
+        <description>Creates a context object from the path parameter and query string</description>
+    </resource>
+    <resource path="/db/lib/wfn.xqm">
+        <description>Various support functions</description>
+    </resource>
+    <resource path="/db/lib/jxml.xqm">
+        <description>Convert json to XML</description>
+    </resource>
+    <resource path="/db/lib/json.xqm">
+        <description>Convert XML to json </description>
+    </resource>
+    <resource path="/db/lib/date.xqm">
+        <description>Convert dates</description>
+    </resource>
+    <resource path="/db/lib/num.xqm">
+        <description>formats numbers</description>
+    </resource>
+    <resource path="/db/temp" ignore="ignore">
+        <description>collection for zips </description>
+    </resource>
+ <!--   <resource path="/db/apps/sys">
+        <description>support faculities for test running and exporting  - much of this has moved to ../lib/sys.xqm</description>
+    </resource>
+ -->
+</resources>
