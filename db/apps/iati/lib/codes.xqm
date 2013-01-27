@@ -142,7 +142,7 @@ return
             return 
             <tr>
                 <th>{$codelist/@version/string()}</th> 
-                <td>{datetime:format-dateTime(xs:dateTime($codelist/@date-last-modified),"dd MMM yyyy")}</td>
+                <td>{xsl:format-dateTime(xs:dateTime($codelist/@date-last-modified),"dd MMM yyyy")}</td>
                 <td><a href="{$context/_root}codelist/{$context/codelist}/version/{$codelist/@version}/lang/{$codelist/@xml:lang}">{$codelist/@xml:lang/string()}</a></td>
                 <td>{if ($codelist/@version = $current/@version)
                      then "Current"

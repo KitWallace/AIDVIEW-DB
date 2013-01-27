@@ -7,7 +7,6 @@ import module namespace codes = "http://tools.aidinfolabs.org/api/codes" at "../
 import module namespace activity = "http://tools.aidinfolabs.org/api/activity" at "../lib/activity.xqm";  
 import module namespace log= "http://tools.aidinfolabs.org/api/log" at "../lib/log.xqm";  
 import module namespace wfn = "http://kitwallace.me/wfn" at "/db/lib/wfn.xqm";
-import module namespace num = "http://kitwallace.me/num" at "/db/lib/num.xqm";
 import module namespace url = "http://kitwallace.me/url" at "/db/lib/url.xqm";
 
 declare function olap:directory($corpus) {
@@ -221,7 +220,7 @@ declare function olap:summary-page($facet-occ,$facet) {
                  { if ($count-all > 0) then concat(" (",round($facet-occ/count div $count-all * 100 ),"%)") else () }
                  </td></tr>
                   {if ($summary/value) 
-                   then <tr><th>Total Value(USD 2010)</th><td>{num:format-number(xs:double($facet-occ/value),"$,000")}</td></tr>
+                   then <tr><th>Total Value(USD 2010)</th><td>{xsl:format-number(xs:double($facet-occ/value),"$,000")}</td></tr>
                    else ()
                   }
                  </table>
@@ -315,7 +314,7 @@ declare function olap:facet-list($context) {
                       <td>{$facet-occ/count-all/string()}</td>
                       <td>{$facet-occ/count/string()}</td>
                       {if ($facet-occ/value)
-                       then <td>{num:format-number(xs:double($facet-occ/value),"$,000")}</td>
+                       then <td>{xsl:format-number(xs:double($facet-occ/value),"$,000")}</td>
                        else ()
                        }
                    </tr>

@@ -5,7 +5,6 @@ import module namespace corpus= "http://tools.aidinfolabs.org/api/corpus" at "..
 import module namespace codes = "http://tools.aidinfolabs.org/api/codes" at "../lib/codes.xqm";  
 import module namespace olap = "http://tools.aidinfolabs.org/api/olap" at "../lib/olap.xqm";  
 import module namespace log = "http://tools.aidinfolabs.org/api/log" at "../lib/log.xqm";  
-import module namespace num = "http://kitwallace.me/num" at "/db/lib/num.xqm";
 import module namespace jxml = "http://kitwallace.me/jxml" at "/db/lib/jxml.xqm";
 import module namespace date = "http://kitwallace.me/date" at "/db/lib/date.xqm";
 import module namespace hc= "http://expath.org/ns/http-client";
@@ -450,7 +449,7 @@ return
              return
                  <tr>
                     <td><a href="{$path}/{wfn:URL-encode($activity/iati-identifier)}">{$activity/iati-identifier/string()}</a></td>
-                    <td>{if ($activity/@iati-ad:project-value) then num:format-number(xs:double($activity/@iati-ad:project-value),"$,000") else ()}</td>
+                    <td>{if ($activity/@iati-ad:project-value) then xsl:format-number(xs:double($activity/@iati-ad:project-value),"$,000") else ()}</td>
                     <td>{$activity/title/string()}</td>
                  </tr> 
             }
@@ -477,10 +476,11 @@ return
                    <td><a href="{$activitySet/download_url}">url</a></td>
                    <td>{count(collection(concat($config:data,$context/corpus,"/activities"))/iati-activity[@iati-ad:activitySet= $activitySet/package])  }</td>
               
-                   <td>{if ($activitySet/metadata_modified) then datetime:format-dateTime($activitySet/metadata_modified,"dd MMM yy") else ()}</td>
-                   <td>{if ($activitySet/download-modified) then datetime:format-dateTime($activitySet/download-modified,"dd MMM yy") else ()}</td>
+                   <td>{if ($activitySet/metadata_modified) then xsl:format-dateTime($activitySet/metadata_modified,"dd MMM yy") else ()}</td>
+                   <td>{if ($activitySet/download-modified) then xsl:format-dateTime($activitySet/download-modified,"dd MMM yy") else ()}</td>
                    <td> {if (empty($activitySet/download-modified)) then "new"
                          else if (activity:download-required($activitySet)) then "stale" 
+                         else if($activitySet/@mode="delete") then "no longer in CKAN"
                          else "current"}
                    </td>
                    <td> {if (exists($activitySet/record))
@@ -639,7 +639,7 @@ declare function activity:as-html($nodes as node()*, $context ) {
                 </tr>
                 <tr><th>Hierarchy </th> <td width="15%" ></td> <td>{codes:code-value("RelatedActivityType",$node/@hierarchy)/name/string()}</td> </tr>
                 {if ($node/@iati-ad:project-value castable as xs:double)
-                 then <tr><th>Project value </th> <td>USD</td><td>{num:format-number(xs:double($node/@iati-ad:project-value),"$,000")}</td></tr>
+                 then <tr><th>Project value </th> <td>USD</td><td>{xsl:format-number(xs:double($node/@iati-ad:project-value),"$,000")}</td></tr>
                  else ()
                 }
                  {activity:as-html($node/title, $context)}
@@ -690,7 +690,7 @@ declare function activity:as-html($nodes as node()*, $context ) {
                  <td>{let $date := ($node/@iso-date,$node)[1]
                       return 
                          if ($date castable as xs:date)
-                         then datetime:format-date(xs:date($date),"dd MMM yyyy")
+                         then xsl:format-date(xs:date($date),"dd MMM yyyy")
                          else $date
                       }
                  </td>
