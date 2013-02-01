@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestSet>
+    <testName>url tests </testName>
+    <description>
+        This tests the functionality of the url module which parses paths and builds menus - 
+    </description>
+    <author>Chris Wallace</author>parse a sequence of path steps into an XML fragment in which pairs of steps are interpreted as an element name and its value
+    <prolog>
+        import module namespace url = "http://kitwallace.me/url" at "/db/lib/url.xqm";
+    </prolog>
+    <test output="xml">
+        <task/>
+        <code>url:parse-path(("A","a","B","b"))</code>
+        <expected>
+            <A>a</A>
+            <B>b</B>
+        </expected>
+    </test>
+    <test output="xml">
+        <task>parse a sequence of path steps </task>
+        <code>url:parse-path(("A","a","B","b","C"))</code>
+        <expected>
+            <A>a</A>
+            <B>b</B>
+            <C/>
+        </expected>
+    </test>
+    <test output="xml">
+        <task>parse a sequence of path steps </task>
+        <code>url:parse-path(())</code>
+        <expected/>
+    </test>
+    <test output="text">
+        <task>build a signature from steps</task>
+        <code>url:path-to-sig(("A","a","B","b"))</code>
+        <expected>A * B *</expected>
+    </test>
+    <test output="text">
+        <task>build a signature from steps </task>
+        <code>url:path-to-sig(("A","a","B","b","C"))</code>
+        <expected>A * B * C</expected>
+    </test>
+    <test output="text">
+        <task>build a signature from steps </task>
+        <code>url:parse-path(())</code>
+        <expected/>
+    </test>
+    <test output="xml">
+        <task>get context - the only parameter accessible is the test path - not sure how to test fully</task>
+        <code>
+            url:get-context()
+        </code>
+        <expected>
+            <context>
+                <testfile qs="true">/db/apps/iati/tests/url.xml</testfile>
+                <_nparam>1</_nparam>
+                <_signature/>
+            </context>
+        </expected>
+    </test>
+    <test output="xml">
+        <task>make menu - empty path</task>
+        <code>
+            url:path-menu("?path=","",(),())
+        </code>
+        <expected/>
+    </test>
+    <test output="xml">
+        <task>make menu </task>
+        <code>
+            url:path-menu("?path=","corpus/x/set/y",(),())
+        </code>
+        <expected/>
+    </test>
+    <test output="xml">
+        <task>make menu </task>
+        <code>
+            url:path-menu("/data/","corpus/x/set/y",(),())
+        </code>
+        <expected/>
+    </test>
+    <test output="xml">
+        <task>make menu - with child options  </task>
+        <code>
+            url:path-menu("/data/","corpus/x",("a","b","c"),())
+        </code>
+        <expected/>
+    </test>
+    <test output="xml">
+        <task>make menu  - with type substitions</task>
+        <code>
+ <![CDATA[        
+         url:path-menu("?_path=","corpus/x/set/y",(),
+             <terms>
+                <term name="corpus">Data Set</term>    
+                <term name="set">Activity Set</term>
+            </terms>  )
+ ]]></code>
+        <expected/>
+    </test>
+</TestSet>

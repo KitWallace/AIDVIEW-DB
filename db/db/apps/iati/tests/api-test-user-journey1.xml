@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestSet>
+    <testName>API - User Journey #1 : test </testName>
+    <description> Browse from main screen to a single sector category (Basic education). Select
+        Country and browse to a single county (Afghanistan). Select Funder and browse to a single
+        Country's files (UK). Select a single file (GB-1-202298-101) </description>
+    <author>Chris Wallace</author>
+    <prolog>
+import module namespace api = "http://tools.aidinfolabs.org/api/api" at "/db/apps/iati/lib/api.xqm";
+    </prolog>
+    <test output="xml">
+        <task>group all by Funder</task>
+        <code>api:api("groupby=Funder")</code>
+    </test>
+    <test output="text">
+        <task>group all by Sector Category</task>
+        <code>count(api:api("groupby=SectorCategory")/*)</code>
+    </test>
+    <test output="xml">
+        <task>Sector Category 112 </task>
+        <code>api:api("SectorCategory=112")</code>
+    </test>
+    <test output="xml">
+        <task>Sector Category 112 grouped by Country</task>
+        <code>api:api("SectorCategory=112&amp;amp;groupby=Country")</code>
+    </test>
+    <test output="xml">
+        <task>Sector Category 112 grouped by Funder</task>
+        <code>api:api("SectorCategory=112&amp;amp;groupby=Funder")</code>
+    </test>
+    <test output="xml">
+        <task>Sector Category =112 and Country=GB</task>
+        <code>api:api("SectorCategory=112&amp;amp;&amp;amp;Country=GB&amp;amp;groupby=Funder")</code>
+    </test>
+    <test output="xml">
+        <task>Activity GB-1-202298 - values</task>
+        <code>api:api("ID=GB-1-202298&amp;amp;result=values")</code>
+    </test>
+    <test output="xml">
+        <task>Activity GB-1-202298 - geo </task>
+        <code>api:api("ID=GB-1-202298&amp;amp;result=geo")</code>
+    </test>
+    <test output="xml">
+        <task>Activity GB-1-202298 - details</task>
+        <code>api:api("ID=GB-1-202298&amp;amp;result=details")</code>
+    </test>
+</TestSet>

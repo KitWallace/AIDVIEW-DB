@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<div id="OLAP">
+    <h1>OLAP</h1>
+    <div>To acheive any performance for queries, either via the REST interface or the query API
+        which access aggregations of activities by sector, country etc., summary data is
+        pre-computed following an update. The facets and the data summaries are configured in an
+        OLAP configuration file which is specific to a corpus and thus can be customised. OLAP
+        computation takes time and this limits the frequency with which the database can be sensibly
+        updated.</div>
+    <div>The configuration file defines for each facet: <ul>
+            <li>The facet name</li>
+            <li>The codelist to use for name expansion if there is one</li>
+            <li>The path to data within the activity</li>
+            <li>The kind of summary - supported values are: <ul>
+                    <li>(basic) ; activity counts and project values</li>
+                    <li>financial : transaction analysis by year and transaction type in addition to
+                        basic summary</li>
+                    <li>sets : download analysis </li>
+                </ul>
+            </li>
+            <li>whether to cache this facet </li>
+            <li>whether this facet is also a RSS feed</li>
+            <li>Links to appear on summary pages using a url language - for example for links to
+                related sites</li>
+        </ul>
+    </div>
+    <div>At present the summaries are only single level, but further extension would support
+        multi-level aggregations, such as sector within country. </div>
+</div>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<div id="samplepaths">
+    <h1>Sample Paths</h1>
+    <div> Search of the activities in a crpus is provided by arbitrary XPath expressions. XPath is a
+        powerful expression language. In the corpus search, the path expression is inserted into an
+        expression equivalent to /activity[path] so that selected activities are those which satisfy
+        the condition expressed by the path. This page provides some examples of typical XPath
+        expressions to achieve specific selection aims. Links are to executions of the selection on the unit test corpus. Executions on the full corpus can take longer to execute since the database indexing is not optimised for these queries.
+        
+        <table class="sortable">
+            <tr>
+                <th>Task</th>
+                <th>XPath</th>
+            </tr>
+            <tr>
+                <td>Activities with results</td>
+                <td>
+                    <a href="?_path=corpus/unitTests/select&amp;q=result">result</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Activities with a website</td>
+                <td>
+                    <a href="/data/corpus/unitTests/select?q=activity-website">activity-website</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Activities with a location with coodinates</td>
+                <td>
+                    <a href="/data/corpus/unitTests/select?q=location/coordinates">location/coordinates</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Activities in Pipeline/identification status</td>
+                <td>
+                    <a href="/data/corpus/unitTests/select?q=activity-status/@code=1">activity-status/@code=1</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Activities with a project value between 1000 and 2000 USD  </td>
+                <td>
+                    <a href="/data/corpus/unitTests/select?q=@iati-ad:project-value &gt; 1000 and @iati-ad:project-value &lt;= 2000">@iati-ad:project-value &gt; 1000 and @iati-ad:project-value &lt;= 2000</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Activities with document-links with a language attribute  </td>
+                <td>
+                    <a href="/data/corpus/unitTests/select?q=document-link/@language">document-link/@language</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Activities with ids containing / </td>
+                <td>
+                    <a href="/data/corpus/unitTests/select?q=contains(iati-identifier,'/')">contains(iati-identifier,"/")</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

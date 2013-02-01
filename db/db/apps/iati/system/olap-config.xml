@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<facets>
+    <!-- this file defines the contents of the olap cache generated forom a corpus of activities.  The cache is  replaced in total, not updated in situ and is expensive.
+          @name - the name of the facet/facet being summarised
+          @code - the name of the reference code table for this facet if there is one
+          @element - the element beinging analysed
+          @path - the path within that element - typically to an augmented attribute - need sto be indexed 
+          @feed - facet is an RSS feed
+          summary - defines the kind of summary to be computed : 
+               activity - count activities
+               compliance - count selected elements
+               financial - transaction summary by type and year
+               set - set data
+          link *  defines a link to displayin the facet summary and can point to supporting webpages - It is used here to link to opencirce 
+    -->
+    <facet name="ActivityStatus" code="ActivityStatus" element="activity-status" path="@iati-ad:status">
+        <summary>activities</summary>
+    </facet>
+    <facet name="Region" code="Region" element="recipient-region" path="@iati-ad:region">
+        <summary>activities</summary>
+    </facet>
+    <facet name="Country" code="Country" element="recipient-country" path="@iati-ad:country" feed="true">
+        <summary>activities</summary>
+        <link href="http://opencirce.org/?_option=propagate&amp;ISO3166={value}" label="OpenCirce"/>
+    </facet>
+    <facet name="Sector" code="Sector" element="sector" path="@iati-ad:sector">
+        <summary>activities</summary>
+    </facet>
+    <facet name="SectorCategory" code="SectorCategory" element="sector" path="@iati-ad:category" feed="true">
+        <summary>activities</summary>
+    </facet>
+    <facet name="Funder" element="participating-org" path="@iati-ad:funder">
+        <summary>activities</summary>
+        <summary from-year="2009" to-year="2013">financial</summary>
+        <link href="http://opencirce.org/org/code/{value}" label="OpenCirce"/>
+    </facet>
+    <facet name="Reporter" element="reporting-org" path="@iati-ad:reporter">
+        <summary>activities</summary>
+        <summary>compliance</summary>
+        <link href="http://opencirce.org/org/code/{value}" label="OpenCirce"/>
+    </facet>
+<!--
+    <facet name="Participant" element="participating-org" path="@iati-ad:org" >
+        <link href="http://opencirce.org/org/code/{value}" label="OpenCirce"/>
+    </facet>
+-->
+    <facet name="Publisher">
+        <summary>activities</summary>
+    </facet>
+</facets>

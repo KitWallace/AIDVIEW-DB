@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestSet>
+    <testName>pipeline tests for IATI</testName>
+    <description>
+        This tests the functionality of the pipeline
+    </description>
+    <author>Chris Wallace</author>
+    <prolog>
+        import module namespace pipeline = "http://tools.aidinfolabs.org/api/activity-transform" at "/db/apps/iati/lib/pipeline1.xqm";
+        import module namespace config = "http://tools.aidinfolabs.org/api/config" at "/db/apps/iati/lib/config.xqm";
+    </prolog>
+    <test output="text">
+        <task>convert a USD value</task>
+        <code>
+            pipeline:convert-value-to-USD("GBP", "2005", "1000") 
+        </code>
+        <expected/>
+    </test>
+</TestSet>

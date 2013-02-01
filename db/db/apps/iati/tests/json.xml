@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestSet>
+    <testName>json tests</testName>
+    <description>
+        This tests conversion between XML and JSON
+    </description>
+    <author>Chris Wallace</author>
+    <prolog>
+<![CDATA[ 
+import module namespace json="http://kitwallace.me/json" at "/db/lib/json.xqm";
+import module namespace jxml="http://kitwallace.me/jxml" at "/db/lib/jxml.xqm";
+let $xml :=
+    <div>
+        <employees>
+            <div>text with embedded " and
+           (newline)  and     (tab) </div>
+            <div mode="1">
+                <firstName>John</firstName>
+                <lastName>Doe</lastName>
+            </div>
+            <div  mode="2">
+                <firstName>Anna</firstName>
+                <lastName>Smith</lastName>
+            </div>
+            <div  mode="3">
+                <firstName>Peter</firstName>
+                <lastName>Jones</lastName>
+            </div>
+        </employees> 
+     </div>
+ let $json := '{"div" : [ {"@mode": 1, "firstName" : "John", "lastName" : "Doe"}, {"@mode": "2", "firstName" : "Anna", "lastName" : "Smith"}, {"@mode": "3", "firstName" : "Peter", "lastName" : "Jones"}]}'
+
+ ]]></prolog>
+    <test>
+        <task>convert simple XML</task>
+        <code>           
+            <![CDATA[
+let $json := util:serialize($xml,"method=json media-type=application/json")   
+return $json   
+            ]]></code>
+        <expected>
+            
+        </expected>
+    </test>
+    <test>
+        <task>convert using my modified json module</task>
+        <code>           
+            <![CDATA[
+            
+let $json := json:xml-to-json($xml) 
+return $json   
+            ]]></code>
+        <expected/>
+    </test>
+    <test>
+        <task>convert using my modified json module and back to XML </task>
+        <code>           
+                    <![CDATA[
+                    
+let $json := json:xml-to-json($xml) 
+let $xml2 := jxml:convert($json)
+return $json  
+            ]]></code>
+        <expected/>
+    </test>
+    <test>
+        <task>convert json to XML - literals</task>
+        <code>           
+            <![CDATA[
+
+let $xml2 := jxml:convert($json)
+return $xml2  
+            ]]></code>
+        <expected/>
+    </test>
+</TestSet>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestSet>
+    <testName>API - localhost unitTests </testName>
+    <description>
+        This tests the functionality of the API using a small test corpus 
+    </description>
+    <author>Chris Wallace</author>
+    <prolog>
+        import module namespace api = "http://tools.aidinfolabs.org/api/api" at "/db/apps/iati/lib/api.xqm";
+    </prolog>
+    <test output="text">
+        <task>activities for Bolivia - values</task>
+        <code>api:api("Country=AF&amp;amp;result=values")</code>
+        <expected>27</expected>
+    </test>
+    <test output="text">
+        <task>group all by Region</task>
+        <code>string(local:run(("groupby=Region","result=values"))/@group-count)</code>
+        <expected>8</expected>
+    </test>
+    <test output="text">
+        <task>group all by Sector</task>
+        <code>string(local:run(("groupby=Sector","result=values"))/@group-count)</code>
+        <expected>31</expected>
+    </test>
+    <test output="text">
+        <task>group all by Sector Category</task>
+        <code>string(local:run(("groupby=SectorCategory","result=values"))/@group-count)</code>
+        <expected>17</expected>
+    </test>
+    <test output="text">
+        <task>group all by Funder</task>
+        <code>string(local:run(("groupby=Funder","result=values"))/@group-count)</code>
+        <expected>4</expected>
+    </test>
+    <test output="text">
+        <task>activities for Bolivia - counts</task>
+        <code>count(local:run(("Country=BO","result=values"))/iati-activity)</code>
+        <expected>13</expected>
+    </test>
+    <test output="text">
+        <task>activities for Bolivia - ids</task>
+        <code>count(local:run(("Country=BO","result=ids"))/iati-activity)</code>
+        <expected>13</expected>
+    </test>
+    <test output="text">
+        <task>activities for Bolivia - full</task>
+        <code>count(local:run(("Country=BO","result=full"))/iati-activity)</code>
+        <expected>13</expected>
+    </test>
+    <test output="text">
+        <task>activities for Bolivia - full - top 5</task>
+        <code>local:run(("Country=BO","result=full","orderby=value","pagesize=5"))/iati-activity[1]/@*:project-value/string()</code>
+        <expected>582273</expected>
+    </test>
+    <test output="text">
+        <task>activities for Bolivia - full - next 5</task>
+        <code>local:run(("Country=BO","result=full","orderby=value","pagesize=5","start=6"))/iati-activity[1]/@*:project-value/string()</code>
+        <expected>203482</expected>
+    </test>
+    <test output="text">
+        <task>activities  where title, description or sector text matches "gender"</task>
+        <code>count(local:run(("result=full","search=gender"))/iati-activity)</code>
+        <expected>11</expected>
+    </test>
+    <test output="text">
+        <task>selected activities grouped</task>
+        <code>count(local:run(("result=values","Country=BO","group=All"))/iati-activity)</code>
+        <expected>13</expected>
+    </test>
+    <test output="text">
+        <task>selected activities grouped and summarised</task>
+        <code>count(local:run(("result=summary","Country=BO","group=All"))/iati-activity)</code>
+        <expected>13</expected>
+    </test>
+</TestSet>
