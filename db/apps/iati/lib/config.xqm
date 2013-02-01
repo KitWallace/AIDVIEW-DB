@@ -1,7 +1,6 @@
 module namespace config = "http://tools.aidinfolabs.org/api/config" ;
 
-declare variable $config:host :=  "http://localhost";
-declare variable $config:ip := "localhost";
+declare variable $config:host :=  "http://data.aidinfolabs.org";
 declare variable $config:dir := "/db/apps/";
 declare variable $config:base := concat($config:dir,"iati/");
 declare variable $config:data := concat($config:dir,"iati-data/");

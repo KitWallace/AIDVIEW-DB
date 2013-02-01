@@ -2,6 +2,7 @@ module namespace corpus ="http://tools.aidinfolabs.org/api/corpus";
 
 import module namespace config = "http://tools.aidinfolabs.org/api/config" at "../lib/config.xqm" ;
 import module namespace activity = "http://tools.aidinfolabs.org/api/activity" at "../lib/activity.xqm" ;
+import module namespace olap = "http://tools.aidinfolabs.org/api/olap" at "../lib/olap.xqm" ;
 
 declare function corpus:meta() as element(corpus)* {
   for $corpus in xmldb:get-child-collections($config:data)
@@ -35,6 +36,7 @@ declare function corpus:create-default-corpii() {
    let $dummy := corpus:create($unitTests)
    return true()
 };
+
 
 declare function corpus:create($corpus as element(config)) {
    if (exists(activity:corpus($corpus/name))) then ()

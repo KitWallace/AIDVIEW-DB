@@ -15,7 +15,7 @@ let $url := concat ($config:host,$context/_fullpath,".rss")
 return 
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-<title>IATI activities in {codes:code-value("Country",$context/Country)/name/string()} : Changes since {xsl:format-dateTime($since,"d MMM yyyy")} </title>
+<title>IATI activities in {codes:code-value("Country",$context/Country)/name/string()} : Changes since {xsl:format-dateTime($since,"DD MMM yyyy")} </title>
 <link>{$url}</link>
 <atom:link  rel="self" type="application/rss+xml" href="{$url}"/>
 {for $activity in $selected-activities
@@ -34,7 +34,7 @@ let $url := concat ($config:host,$context/_fullpath,".rss")
 return 
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-<title>IATI activities in {codes:code-value("SectorCategory",$context/SectorCategory)/name/string()} : Changes since {xsl:format-dateTime($since,"d MMM yyyy")}</title>
+<title>IATI activities in {codes:code-value("SectorCategory",$context/SectorCategory)/name/string()} : Changes since {xsl:format-dateTime($since,"DD MMM yyyy")}</title>
 <link>{$url}</link>
 <atom:link  rel="self" type="application/rss+xml" href="{$url}"/>
 {for $activity in $selected-activities

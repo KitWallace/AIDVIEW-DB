@@ -44,6 +44,10 @@ declare function activity:activitySet-all($corpus as xs:string) as element(activ
   doc(activity:activitySet-path($corpus))/activitySets
 };
 
+declare function activity:activitySets-last-ckan-update($corpus as xs:string) as xs:dateTime? {
+  doc(activity:activitySet-path($corpus))/activitySets/@last_ckan_update
+};
+
 declare function activity:corpus-publishers($corpus as xs:string)  as xs:string* {
    distinct-values(doc(activity:activitySet-path($corpus))//publisher)
 };
@@ -61,12 +65,16 @@ declare function activity:activitySet($corpus as xs:string,$package as xs:string
 };
 
 declare function activity:activitySet-with-url($context as element(context))   as element(activitySet) * {
-    doc(activity:activitySet-path($context/corpus))//activitySet[metadata/download_url = $context/url]
+    doc(activity:activitySet-path($context/corpus))//activitySet[download_url = $context/url]
 };
 
 declare function activity:download-required($activitySet as element(activitySet) ?) as xs:boolean {
     empty($activitySet/download-modified) 
     or (exists ($activitySet/metadata_modified) and (xs:dateTime($activitySet/download-modified) < xs:dateTime($activitySet/metadata_modified)))
+};
+
+declare function activity:since-last-ckan($corpus,$activitySet as element(activitySet) ?) as xs:boolean {
+    activity:download-required($activitySet) and (activity:activitySets-last-ckan-update($corpus)  < xs:dateTime($activitySet/metadata_modified))
 };
 
 declare function activity:activitySets-download-required($corpus as xs:string) as element(activitySet) * {
@@ -81,12 +89,25 @@ declare function activity:ckan-packages($context as element(context)) {
       let $url := concat($config:ckan-base,"/api/search/package?filetype=activity")
       let $list :=jxml:convert-url($url,<params><rough/></params>)
       let $max := $list/div/count
-      return
+      let $logit := log:write_xml( element record {
+                                        $context/corpus,
+                                        element task {"ckan"},
+                                        element level{"info"},                                       
+                                        element message {concat($max ," packeges on registry")}
+                                     })
+      let $packages :=
           for $i in (1 to  ($max idiv 1000 ) + 1)
           let $start := ($i - 1)* 1000 
           let $url := concat($config:ckan-base,"/api/search/package?filetype=activity&amp;start=",xs:string($start),"&amp;limit=1000")
           let $list :=jxml:convert-url($url,<params><rough/></params>)
           return $list//results/item
+      let $logit := log:write_xml( element record {
+                                        $context/corpus,
+                                        element task {"ckan"},
+                                        element level{"info"},                                       
+                                        element message {concat(count($packages) ," packages to be merged")}
+                                     })
+      return $packages
 };
 
 (:
@@ -109,9 +130,11 @@ return
 
 declare function activity:ckan-activitySets($context) {
   let $packages := activity:ckan-packages($context)
+  let $current-doc := doc(activity:activitySet-path($context/corpus))/activitySets
+  let $backup := xmldb:store(concat( $config:data,$context/corpus),concat("activitySet-",current-date(),".xml"),$current-doc)
   let $activitySets := activity:activitySets($context/corpus)
   let $merged := activity:update-activitySets($context/corpus,$packages,$activitySets)
-  let $activitySets := element activitySets { $merged }
+  let $activitySets := element activitySets { attribute last_ckan_update {current-dateTime()}, $merged }
   let $store := xmldb:store(concat($config:data,$context/corpus,"/sets"),"activitySets.xml",$activitySets)
   return 
      $store
@@ -132,37 +155,20 @@ declare function activity:ckan-activitySet($package as xs:string) as element(act
          }       
 };
 
-(: may not need this if we depend solely on the registry :)
-declare function activity:source-activitySet($url) {
-    if ($url)
-    then 
-        let $request :=
-          element hc:request {attribute method {"HEAD"}, attribute href {$url}, attribute timeout {"10"} } 
-        let $result :=  util:catch("*",  hc:send-request($request) , ())
-        let $meta := $result[1]
-        let $status := $meta/@status/string()
-        return
-         if (empty($meta))
-         then <error>http request failed</error>      
-         else if ($status="200")
-         then 
-            let $last-modified := $meta/hc:header[@name="last-modified"]/@value/string()
-            return        
-               element source {
-                  $url,
-                  if (exists($last-modified))
-                  then element source-last-modified {date:RFC-822-to-dateTime($last-modified)}  (: convert to xs:date :)
-                  else ()
-                }
-         else <error>http Status {$status}</error>
-    else ()
-};
-
 declare function activity:update-activitySets($corpus,$packages, $sets)  as item()* {
-    for $key in 
+    for $key at $i in 
          for $key in distinct-values(($packages,$sets/package)) order by $key return $key
     let $ckan:= $packages[.=$key]
     let $set:= $sets[package=$key]
+    let $log-progress := if ($i mod 10 = 0)
+                         then log:write_xml( element record {
+                                        $corpus,
+                                        element task {"ckan"},
+                                        element level{"info"}, 
+                                        element package {$key} , 
+                                        element message {$i}
+                                     })
+                         else ()
     return
         if (exists($ckan) and exists($set))  (: an existing package :)
         then 
@@ -184,8 +190,9 @@ declare function activity:update-activitySets($corpus,$packages, $sets)  as item
                 else 
                      element activitySet { 
                         $metadata/*,   
+                        $set/activity-count,
                         $set/download-modified
-                     }
+                      }
         else if (exists($ckan))  (: no existing set  :)
         then 
              let $metadata := activity:ckan-activitySet($key)
@@ -203,7 +210,8 @@ declare function activity:update-activitySets($corpus,$packages, $sets)  as item
                            
                 else 
                      element activitySet { 
-                         $metadata/*
+                         $metadata/*,
+                         element activity-count {0}
                    }  
         else if (exists($set)) 
         then 
@@ -227,7 +235,7 @@ declare function activity:download-activitySets($activitySets as element(activit
 };
 
 declare function activity:download-activitySet ($activitySet as element(activitySet), $context,  $refresh) {
- if (empty($activitySet/ignore) and ($refresh or activity:download-required($activitySet)) or exists($activitySet/record))
+ if (empty($activitySet/ignore) and ($refresh or activity:download-required($activitySet)))
  then
     let $activity-collection := concat($config:data,$context/corpus,"/activities")
     let $corpus-meta := corpus:meta($context/corpus)
@@ -279,7 +287,8 @@ declare function activity:download-activitySet ($activitySet as element(activity
              return 
                 if ( $refresh 
                      or empty($current-activity) 
-                     or ($hash ne $activity/@iati-ad:hash)
+                     or ($activity/@last-updated-datetime >  $activitySet/download-modified)
+                     or (activity:hash($activity) ne $activity/@iati-ad:hash)
                    )
                 then 
                    (: transform and then store 
@@ -336,11 +345,16 @@ declare function activity:download-activitySet ($activitySet as element(activity
                                         $activitySet/package , 
                                         element message {concat(count($download), " activities downloaded")}
                                    })
+        let $activity-count := count(collection($activity-collection)/iati-activity[@iati-ad:activitySet = $activitySet/package])
         let $dt := util:system-dateTime()
         let $update-date := 
              if ($activitySet/download-modified)
              then update replace $activitySet/download-modified with element download-modified {$dt}
              else update insert element download-modified {$dt} into  $activitySet
+        let $update-count :=
+             if ($activitySet/activity-count)
+             then update replace $activitySet/activity-count with element activity-count {$activity-count}
+             else update insert element activity-count {$activity-count} into  $activitySet
         let $update-corpus := corpus:activities-updated($context/corpus) 
         return $url
     else ()
@@ -348,27 +362,20 @@ declare function activity:download-activitySet ($activitySet as element(activity
 
 declare function activity:external-activitySet($context)  as element(activitySet) {
         let $current-activitySet := activity:activitySet-with-url($context)
-        let $source := activity:source-activitySet($context/url)
         let $activitySet := 
           if (exists ($current-activitySet))
           then 
            element activitySet {
                $current-activitySet/package,
                element publisher {"external"},
-               element metadata {
-                   element download_url {$context/url/string()}
-               },
-               $source
+               element download_url {$context/url/string()}
            }
 
          else 
           element activitySet {
             element package{ util:uuid() },
             element publisher {"external"},
-            element metadata {
-                   element download_url {$context/url/string()}
-            },
-            $source
+            element download_url {$context/url/string()}
          }
         
        let $package := 
@@ -384,10 +391,6 @@ declare function activity:external-activitySet($context)  as element(activitySet
       return activity:activitySet($context/corpus,$package)
 };
 
-
-(:  store an activity 
-  
-:)
 declare function activity:store-activity($activitySet as element(activitySet), $corpus as xs:string, $activity as element(iati-activity)) as xs:string {
     let $activity-collection := concat($config:data,$corpus,"/activities")
     let $id := normalize-space($activity/iati-identifier)
@@ -406,7 +409,6 @@ declare function activity:store-activity($activitySet as element(activitySet), $
     return
         $id
 };
-
 
 declare function activity:remove-activities ($activitySets as element(activitySet)*,$context) {
 (:      let $dump := concat($config:base,"dump")  ):) 
@@ -430,8 +432,7 @@ declare function activity:remove-activities ($activitySets as element(activitySe
 };
 
 
-
-(:  pages :)
+(:  HTML pages :)
 
 declare function activity:page($activities, $context ,$path) {
    activity:page($activities, $context ,$path, $path)
@@ -464,20 +465,18 @@ return
           {wfn:paging-with-path2($path,$context/start,$context/pagesize,count($activitySets))}
           <table class="sortable"> 
             <tr><th>Publisher</th><th>CKAN</th><th>Set</th><th>URL</th><th>Activities</th><th>Metadata</th><th>Download</th></tr>
-            {for $activitySet in $subset
-             
+            {for $activitySet in $subset        
              return
                if (exists($activitySet/publisher))
                then
                  <tr>
                    <td><a href="{$context/_root}corpus/{$context/corpus}/Publisher/{$activitySet/publisher}">{$activitySet/publisher/string()}</a></td>
                    <td>{if ($activitySet/publisher ne "external") then <a class="external" href="http://www.iatiregistry.org/dataset/{$activitySet/package}">CKAN</a> else ()}</td>
-                   <td><a href="{$context/_root}corpus/{$context/corpus}/set/{$activitySet/package}/activity">{$activitySet/package/string()}</a></td>
+                   <td><a href="{$path}/{$activitySet/package/string()}/activity">{$activitySet/package/string()}</a></td>
                    <td><a href="{$activitySet/download_url}">url</a></td>
-                   <td>{count(collection(concat($config:data,$context/corpus,"/activities"))/iati-activity[@iati-ad:activitySet= $activitySet/package])  }</td>
-              
-                   <td>{if ($activitySet/metadata_modified) then xsl:format-dateTime($activitySet/metadata_modified,"dd MMM yy") else ()}</td>
-                   <td>{if ($activitySet/download-modified) then xsl:format-dateTime($activitySet/download-modified,"dd MMM yy") else ()}</td>
+                   <td>{$activitySet/activity-count/string()}</td>
+                   <td>{if ($activitySet/metadata_modified) then xsl:format-dateTime($activitySet/metadata_modified,"DD MMM YY") else ()}</td>
+                   <td>{if ($activitySet/download-modified) then xsl:format-dateTime($activitySet/download-modified,"DD MMM YY") else ()}</td>
                    <td> {if (empty($activitySet/download-modified)) then "new"
                          else if (activity:download-required($activitySet)) then "stale" 
                          else if($activitySet/@mode="delete") then "no longer in CKAN"
@@ -690,7 +689,7 @@ declare function activity:as-html($nodes as node()*, $context ) {
                  <td>{let $date := ($node/@iso-date,$node)[1]
                       return 
                          if ($date castable as xs:date)
-                         then xsl:format-date(xs:date($date),"dd MMM yyyy")
+                         then xsl:format-date(xs:date($date),"DD MMM yyyy")
                          else $date
                       }
                  </td>
@@ -810,7 +809,7 @@ declare function activity:as-html($nodes as node()*, $context ) {
               <tr>
                 <th>Document</th>
                 <td>{$node/@format/string()}</td>    
-                <td> {codes:code-value("DocumentCategory",$node/category/@code)/name/string()}: <a class="external" href="{$node/@url}">{($node/title/string(),$node/text(),"Document")[1]}</a></td>
+                <td> {codes:code-value("DocumentCategory",($node/category/@code)[1])/name/string()}: <a class="external" href="{$node/@url}">{($node/title/string(),$node/text(),"Document")[1]}</a></td>
               </tr>
        case element(result) return
               <tr>

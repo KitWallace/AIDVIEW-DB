@@ -33,7 +33,7 @@ declare function wfn:average($nums as xs:decimal*) as xs:decimal? {
 };
 
 declare function wfn:value-in-ks($val as xs:double) as element(span) {
-   let $aval := math:abs($val)  (: this needs a sig putting back else its unsigned :)
+   let $aval := abs($val)  (: this needs a sig putting back else its unsigned :)
    let $scaled-value :=
 
       if ($aval > 1.0E9) then concat(string(round-half-to-even($val div 1.0E9,3)),"b")
@@ -141,8 +141,8 @@ declare function wfn:node-join($nodes,$sep1,$sep2) {
 
 (: more to do here :)
 declare function wfn:paging($url as xs:string, $start as xs:integer, $pagesize as xs:integer, $max as xs:integer ) as element(div)?{
-  let $pages := xs:integer(math:ceil($max div $pagesize) )
-  let $page :=  math:floor($start div $pagesize) + 1
+  let $pages := xs:integer(ceiling($max div $pagesize) )
+  let $page :=  floor($start div $pagesize) + 1
   let $prev-start := max(($start - $pagesize,1))
   let $next-start := $start + $pagesize
   return 
@@ -172,8 +172,8 @@ declare function wfn:paging($url as xs:string, $start as xs:integer, $pagesize a
 
 
 declare function wfn:paging-with-path($url as xs:string, $start as xs:integer, $pagesize as xs:integer, $max as xs:integer ) as element(div)? {
-  let $pages := xs:integer(math:ceil($max div $pagesize) )
-  let $page :=  math:floor($start div $pagesize) + 1
+  let $pages := xs:integer(ceiling($max div $pagesize) )
+  let $page :=  floor($start div $pagesize) + 1
   let $prev-start := max(($start - $pagesize,1))
   let $next-start := $start + $pagesize
   let $q := if (contains($url,"?")) then "&amp;" else "?"
@@ -211,8 +211,8 @@ declare function wfn:paging-with-path2($url as xs:string, $start as xs:integer, 
         Full List | <a href="{$url}{$q}start=1&amp;pagesize=25">First Page</a> 
       </div>
     else  
-  let $pages := xs:integer(math:ceil($max div $pagesize) )
-  let $page :=  xs:integer(math:floor($start div $pagesize) + 1)
+  let $pages := xs:integer(ceiling($max div $pagesize) )
+  let $page :=  xs:integer(floor($start div $pagesize) + 1)
   let $prev-start := max(($start - $pagesize,1))
   let $next-start := $start + $pagesize
   let $start-pages := 1 to min((3,$pages))
@@ -279,7 +279,7 @@ declare function wfn:replace($text,$replacements as element(replace)*) {
 };
 
 declare function wfn:round($v as xs:decimal , $p as xs:integer) as xs:double {
-    let $f := math:power(10,$p)
+    let $f := math:pow(10,$p)
     return  round($v * $f) div $f
 };
 

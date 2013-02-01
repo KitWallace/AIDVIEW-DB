@@ -141,14 +141,11 @@
     <resource path="system/filesystem" ignore="ignore">
         <description>copies of files in the file system - use the exist files with care since these files are updated between versions </description>
     </resource>
--   <resource path="system/filesystem/conf.xml">
-        <description>exist server configuration file moded to include required modules </description>
-    </resource>
     <resource path="system/filesystem/log4j.xml">
         <description>application specific log file IATI.log defined</description>
     </resource>
     <resource path="system/filesystem/dev.aidinfolabs.org.conf">
-        <description>apache virtual host file - t</description>
+        <description>apache virtual host file </description>
     </resource>
     <resource path="schemas">
         <description>The XML Schemas defining iati-activity</description>
@@ -225,14 +222,4 @@
     <resource path="/db/lib/date.xqm">
         <description>Convert dates</description>
     </resource>
-    <resource path="/db/lib/num.xqm">
-        <description>formats numbers</description>
-    </resource>
-    <resource path="/db/temp" ignore="ignore">
-        <description>collection for zips </description>
-    </resource>
- <!--   <resource path="/db/apps/sys">
-        <description>support faculities for test running and exporting  - much of this has moved to ../lib/sys.xqm</description>
-    </resource>
- -->
 </resources>

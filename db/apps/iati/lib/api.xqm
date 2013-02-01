@@ -10,13 +10,13 @@ declare namespace iati-ad = "http://tools.aidinfolabs.org/api/AugmentedData";
 import module namespace config = "http://tools.aidinfolabs.org/api/config" at "../lib/config.xqm";
 import module namespace codes = "http://tools.aidinfolabs.org/api/codes" at "../lib/codes.xqm";
 import module namespace olap = "http://tools.aidinfolabs.org/api/olap" at "../lib/olap.xqm";
+import module namespace corpus= "http://tools.aidinfolabs.org/api/corpus" at "../lib/corpus.xqm";
 
 import module namespace json = "http://kitwallace.me/json" at "/db/lib/json.xqm";
 
 declare variable $api:parameters :=  doc(concat($config:config,"api.xml"))//param;
 declare variable $api:version := "2012-09-14T17:00:00";
 declare variable $api:max-activities := 3000;  (: maximum number of individual activities returned - if more then nothing !! :)
-declare variable $api:corpii := doc(concat($config:config,"corpusindex.xml"))//corpus[empty(@temp)];
 
 declare variable $api:default := 
 <query>
@@ -26,7 +26,7 @@ declare variable $api:default :=
   <pagesize>20</pagesize>
   <result>values</result>
   <format>xml</format>
-  <corpus>{$api:corpii[@default]/@name/string()}</corpus>
+  <corpus>{corpus:meta()[default]/name/string()}</corpus>
   <test>yes</test>
   <search/>
   <groupby/>
@@ -227,7 +227,7 @@ declare function api:query-activities ($query as element(query) ) as element(act
              concat ("[",$term/path,"='",$term/value,"']")
   let $filters := if ($query/search and string-length($query/search) >= 3 ) 
   then concat($filters,"[ft:query((title|description),'",replace($query/search,"'","''"),"')]") else $filters
-  let $exp := concat("collection('",$config:data,$query/corpus,"/activities')/iati-activity[@iati-ad:live][@iati-ad:include]",string-join($filters,""))
+  let $exp := concat("collection('",$config:data,$query/corpus,"/activities')/iati-activity[@iati-ad:include]",string-join($filters,""))
   return  util:eval($exp)
 };
 
@@ -348,7 +348,7 @@ return
 
 declare function api:group-by-country($query  as element(query),$activities as element(iati-activity)*)  {
 let $facet := "Country"
-for $group in codes:codelist($facet)/*
+for $group in olap:facet($query/corpus,$facet)
 let $group-activities :=  $activities[recipient-country/@iati-ad:country eq $group/code]
 return 
   api:group-summary($facet,$group,$group-activities,$query)
@@ -356,7 +356,7 @@ return
 
 declare function api:group-by-region($query  as element(query),$activities as element(iati-activity)*)  {
 let $facet := "Region"
-for $group in codes:codelist($facet, $query/corpus)
+for $group in olap:facet($query/corpus,$facet)
 let $group-activities :=  $activities[recipient-region/@iati-ad:region eq $group/code]
 return 
    api:group-summary($facet,$group,$group-activities,$query)
@@ -364,7 +364,7 @@ return
 
 declare function api:group-by-funder($query  as element(query),$activities as element(iati-activity)*)  {
 let $facet := "Funder"
-for $group in codes:codelist($facet, $query/corpus)
+for $group in olap:facet($query/corpus,$facet)
 let $group-activities :=  $activities[participating-org/@iati-ad:funder eq $group/code]
 return 
    api:group-summary($facet,$group,$group-activities,$query)
@@ -372,7 +372,7 @@ return
 
 declare function api:group-by-sector($query  as element(query),$activities as element(iati-activity)*)  {
 let $facet := "Sector"
-for $group in codes:codelist($facet)/*
+for $group in olap:facet($query/corpus,$facet)
 let $group-activities :=  $activities[sector/@iati-ad:sector eq $group/code]
 return 
    api:group-summary($facet,$group,$group-activities,$query)
@@ -380,7 +380,7 @@ return
 
 declare function api:group-by-category($query  as element(query),$activities as element(iati-activity)*)  {
 let $facet := "SectorCategory"
-for $group in codes:codelist($facet, $query/corpus)
+for $group in olap:facet($query/corpus,$facet)
 let $group-activities :=  $activities[sector/@iati-ad:category eq $group/code]
 return 
    api:group-summary($facet,$group,$group-activities,$query)
@@ -391,21 +391,21 @@ return
 :)
 
 declare function api:query-olap($query) {
-let $olap := collection(concat($config:base,"olap/", $query/corpus))/dimensions
+let $olap := olap:facet($query/corpus ,"Corpus")
 return
   if (empty($olap) or exists($query/search) or empty($query/groupby)) then ()
   else  if (count($query/term) = 1 and not($query/term/@name = "ID")  and $query/groupby="All" )
   then  
-     $olap/*[name()= $query/term/@name][code = $query/term//value]
+     olap:facet-code($query/corpus,$query/term/@name, $query/term//value)
   else  if (count($query/term) = 1  and $query/groupby eq $query/term/@name )  (:grouping by the selected term :)
   then  
-     $olap/*[name()= $query/term/@name][code = $query/term//value]
+     olap:facet-code($query/corpus,$query/term/@name, $query/term//value)
   else if (empty($query/term) and exists($query/groupby) and $query/groupby ne "All")
   then 
-     $olap/*[name()= $query/groupby]
+     olap:facet($query/corpus,$query/groupby)
   else if (empty($query/term) and exists($query/groupby) and $query/groupby="All")
   then 
-     $olap/summary   (: no summary of a facet stored at present :)
+     $olap   (: no summary of a facet stored at present :)
   else ()
 };
 
@@ -423,7 +423,7 @@ declare function api:query-activity-form($query) as element(table) {
                       element td {
                         if (exists($field/@code))
                         then 
-                           let $codelist:= codes:codelist($field/@name,$query/corpus)
+                           let $codelist:= olap:facet($query/corpus,$field/@code)
 
                            return
                         element select {
@@ -474,7 +474,7 @@ declare function api:query-form($query) as element(table) {
                       element td {
                         if (exists($field/@code))
                         then 
-                           let $codelist:= codes:codelist($field/@name,$query/corpus)
+                           let $codelist:= olap:facet($query/corpus,$field/@code)
 
                            return
                         element select {
@@ -596,13 +596,13 @@ declare function api:query-form($query) as element(table) {
             <td>set of activities to search over ; </td>
             <td>  
                 <select name="corpus" size="3">
-                {for $corpus in $api:corpii
+                {for $corpus in corpus:meta()[empty(temp)]
                  return 
                     element option {
-                       if ($corpus/@name = $query/corpus)
+                       if ($corpus/name = $query/corpus)
                        then attribute selected {"selected"}
                        else (),
-                       $corpus/@name/string()
+                       $corpus/name/string()
                     }
                }
               </select>
@@ -735,7 +735,7 @@ then
       else  $selected-items
   let $run-end := util:system-time()
   let $run-milliseconds := (($run-end - $run-start) div xs:dayTimeDuration('PT1S'))  * 1000 
-(:  let $logit := api:log-query($query/corpus, api:construct-query-string($params),$run-milliseconds) :)
+  let $logit := api:log-query($query/corpus, api:construct-query-string($params),$run-milliseconds) 
 
 let $result :=
 element result {

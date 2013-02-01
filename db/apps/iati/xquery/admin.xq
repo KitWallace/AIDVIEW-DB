@@ -29,6 +29,8 @@ then
    <head>
      <script src="{$base}jscript/sorttable.js" type="text/javascript" charset="utf-8"></script>
      <link rel="stylesheet" type="text/css" href="{$base}assets/screen.css"/>
+     <title>AIDVIEW-DB - V3 - admin</title>
+ 
   </head> 
   <body class="admin">
      {$content}

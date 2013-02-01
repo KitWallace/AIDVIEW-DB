@@ -1,7 +1,7 @@
 declare option exist:serialize "method=xhtml media-type=text/html";
 
 let $q := normalize-space(request:get-parameter("q",()))
-let $dir:= normalize-space(request:get-parameter("dir",()))
+let $tdir:= normalize-space(request:get-parameter("dir",()))
 let $dirs := ("lib","xquery","utils")
 let $base := "/db/apps/iati/"
 return 
@@ -12,7 +12,10 @@ return
         Search <select name="dir">
            {for $dir in $dirs 
            return 
-             <option>{$dir}</option>
+              element option {
+                   if ($dir = $tdir) then attribute selected {"selected"} else (),
+                   $dir
+                }
            }
            </select> for <input type="text" name="q" size="30" value="{$q}" />
    </form>
@@ -20,7 +23,7 @@ return
    {
    if (exists($q) and $q ne "") 
    then 
-     let $directory := concat($base,$dir)
+     let $directory := concat($base,$tdir)
      let $files := xmldb:get-child-resources($directory)
      
      let $docs := 
@@ -32,12 +35,12 @@ return
              where $line[contains(.,$q)]
              return <match ln="{$ln}">{$line}</match>
         return
-           if ($matches) then <doc name="{$file}" >{$matches}</doc> else ()
+           <doc name="{$file}"  count="{count($lines)}">{$matches}</doc>
 
      return
         <div>
-           <h2> {$q} matched {count($docs//match)}</h2>
-           {for $doc in $docs
+           <h2> {$q} matched {count($docs//match)} in {sum($docs/@count)}</h2>
+           {for $doc in $docs[match]
             return 
              <div>
                <h3>{$doc/@name/string()}</h3>

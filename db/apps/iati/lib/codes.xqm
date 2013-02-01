@@ -49,15 +49,6 @@ declare function codes:code-value($code as xs:string, $id as xs:string?) {
    collection($codes:current)/codelist[@name = $code]/*[code=$id]
 };
 
-
-declare function codes:codelist($code as xs:string, $corpus as xs:string ) { 
-  collection(concat($config:olap,$corpus))/dimensions/*[name(.) = $code]
-};
-
-declare function codes:code-value($code as xs:string, $id as xs:string? ,$corpus as xs:string ) { 
-  collection(concat($config:olap,$corpus))/dimensions/*[name(.) = $code]/summary[code=$id]
-};
-
 (: these functions generate html content :)
 declare function codes:code-index-as-html ($context) as element(div){
   <div>
@@ -142,7 +133,7 @@ return
             return 
             <tr>
                 <th>{$codelist/@version/string()}</th> 
-                <td>{xsl:format-dateTime(xs:dateTime($codelist/@date-last-modified),"dd MMM yyyy")}</td>
+                <td>{xsl:format-dateTime(xs:dateTime($codelist/@date-last-modified),"DD MMM yyyy")}</td>
                 <td><a href="{$context/_root}codelist/{$context/codelist}/version/{$codelist/@version}/lang/{$codelist/@xml:lang}">{$codelist/@xml:lang/string()}</a></td>
                 <td>{if ($codelist/@version = $current/@version)
                      then "Current"

@@ -3,11 +3,11 @@ import module namespace config = "http://tools.aidinfolabs.org/api/config" at ".
 import module namespace corpus= "http://tools.aidinfolabs.org/api/corpus" at "../lib/corpus.xqm";  
 
 
-declare function admin:initialize() {
+declare function admin:initialize() as element(div) {
 
 (: use the corpus index to create the data files :)
 
-<result>
+<div>
      {admin:reindex()}
      
      {xmldb:create-collection($config:dir,"iati-data")}
@@ -24,11 +24,11 @@ declare function admin:initialize() {
      {xmldb:chmod-resource(concat($config:base,"xquery"),"download-job.xq",util:base-to-integer(0755,8))}
 
 
-</result>
+</div>
 };
 
 
-declare function admin:reindex() {
+declare function admin:reindex() as element(div) {
     let $reindex-config := xmldb:reindex($config:base)   
-    return "config, codes and other system resources reindexed"
+    return <div>config, codes and other system resources reindexed</div>
 };

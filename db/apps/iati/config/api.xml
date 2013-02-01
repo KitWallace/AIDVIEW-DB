@@ -4,7 +4,8 @@
     <param name="Country" code="Country" group="yes" path="recipient-country/@iati-ad:country" priority="3"/>
     <param name="Sector" code="Sector" group="yes" path="sector/@iati-ad:sector" priority="2"/>
     <param name="SectorCategory" code="SectorCategory" group="yes" path="sector/@iati-ad:category" priority="4"/>
-    <param name="Funder" code="OrganisationIdentifier" group="yes" from-year="2009" to-year="2013" path="participating-org/@iati-ad:funder" priority="6"/>
-    <param name="ActivityStatus" code="ActivityStatus" group="yes" path="activity-status/@code" priority="2"/>
+    <param name="Funder" code="Funder" group="yes" from-year="2009" to-year="2013" path="participating-org/@iati-ad:funder" priority="6"/>
+    <param name="Reporter" code="Reporter" group="yes" path="reporting-org/@iati-ad:reporter" priority="6"/>
+    <param name="ActivityStatus" code="ActivityStatus" group="yes" path="activity-status/@iati-ad:status" priority="7"/>
     <param name="ID" path="iati-identifier" priority="1"/>
 </parameters>

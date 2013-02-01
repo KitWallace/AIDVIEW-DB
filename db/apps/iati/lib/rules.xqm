@@ -35,7 +35,7 @@ declare function rules:codelist-rules($codelist) {
    $rules:activity-rulesets/rule[codelist=$codelist]
 };
 
-declare function rules:check-node($doc, $this, $steps as xs:string*, $rules as element(rule) ) as element(span)* {
+declare function rules:check-node($doc, $this, $steps as xs:string*, $rules as element(rule)* ) as element(span)* {
      let $leaf := $steps[last()]
      let $path := concat("/",string-join($steps,"/"))
 
@@ -70,7 +70,7 @@ declare function rules:check-node($doc, $this, $steps as xs:string*, $rules as e
  
 };
 
-declare function rules:check-sequence($doc, $node, $steps as xs:string*,  $rules as element(rule) ) as element(span)* {
+declare function rules:check-sequence($doc, $node, $steps as xs:string*,  $rules as element(rule)* ) as element(span)* {
   let $path := concat("/",string-join($steps,"/"))
   let $sequence := if (exists($steps)) then concat($path,"/*") else "/*" 
   let $rules := $rules[path = $sequence] 

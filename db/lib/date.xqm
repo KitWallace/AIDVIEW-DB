@@ -45,7 +45,7 @@ let $month-day1 := xs:date(concat($yearmonth,"-01"))
 let $month-day1-weekday := datetime:day-in-week($month-day1)
 let $days := datetime:days-in-month($month-day1)
 let $offset := $month-day1-weekday -1
-let $weeks  := xs:integer(math:ceil (($days + $offset) div 7 ))
+let $weeks  := xs:integer(ceiling (($days + $offset) div 7 ))
 return
 <div>
   <table>

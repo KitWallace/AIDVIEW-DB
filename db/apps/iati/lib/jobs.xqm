@@ -17,6 +17,13 @@ let $all-jobs := scheduler:get-scheduled-jobs()
 return $all-jobs//scheduler:job[@name=$jobname]
 };
 
+declare function jobs:html-list($context) {
+    <ul>
+          {for $job in jobs:scheduled-jobs()
+           return <li>{$job/@name/string()} : state {$job//state/string()} </li>
+          }
+   </ul>
+};
 
 declare function jobs:start-olap($context) {
 let $login := config:login()
