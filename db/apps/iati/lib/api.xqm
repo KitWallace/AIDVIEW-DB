@@ -1,7 +1,7 @@
 
 (:  
   This module provides functions to support the api, initially for whiteoctober
-   Version 2 - performance improved
+   Version 3 - performance improved and facets generalised 
 :)
   
 module namespace api = "http://tools.aidinfolabs.org/api/api";
@@ -253,78 +253,6 @@ return
        }
 };
 
-(:  some alternative approaches to the grouping task which have been tried 
-
-(:  this function performs a distinct values to get the actual codes in the selected activities :)
-
-declare function api:group-by-country-d($query  as element(query),$activities as element(iati-activity)*)  {
-for $country in distinct-values($activities/recipient-country/@iati-ad:country)
-let $code := codes:code-value("Country",$country)
-let $country-activities := $activities[recipient-country/@iati-ad:country eq $country]
-return 
-   element Country {
-       $code/code,
-       $code/name,
-       if ($query/result eq "ids") then ()
-       else 
-            (element value { sum ($country-activities/recipient-country[@iati-ad:country = $country]/@iati-ad:project-value)},
-             element count {  count($country-activities) },
-             if ($query/result eq "summary")
-             then api:activity-group-summary($country-activities,$query)
-             else ()
-            )
-       }
-};
-
-
-(: this is a generic function using the paths in the olap configuration file - but it is not as a fas as the hard coded grouping functions :)
-
-declare function api:group-by-country-m($query  as element(query),$activities as element(iati-activity)*)  {
-let $facet := "Country"
-let $meta-dimension := olap:meta-dimension($facet) 
-for $group in codes:codelist($facet, $query/corpus)
-let $group-activities :=  util:eval(concat("$activities[",$meta-dimension/@path,"= $group/code]"))
-let $count := count($group-activities)
-where $count > 0
-return 
-   element {$facet} {
-       $group/code,
-       $group/name,
-       if ($query/result eq "ids") then ()
-       else 
-            (element value { sum ($group-activities/@iati-ad:project-value)},
-             element count { $count},
-             if ($query/result eq "summary")
-             then api:activity-group-summary($group-activities,$query)
-             else ()
-            )
-       }
-};
-
-(: this version uses the group by construct of XQuery 3.0 - doesnt help because activities can have multiple countries :)
-declare function api:group-by-country-g($query  as element(query),$activities as element(iati-activity)*)  {
-for $activity in $activities
-group $activity as $group-activities by $activity/recipient-country[1]/@iati-ad:country as $group-code
-return
-let $code := codes:code-value("Country",$group-code,$query/corpus)
-return 
-   element Country {
-       element code {$group-code/string()},
-       element name {$code/name/string()},
-       if ($query/result eq "ids") then ()
-       else 
-            (
-             element value { sum ($group-activities/@iati-ad:project-value)},
-             element count { $count},
-            if ($query/result eq "summary")
-            then api:activity-group-summary($group-activities,$query)
-             else ()
-            )
-       }
-};
-:)
-
-
 declare function api:group-summary($facet as xs:string, $group as node() ,$group-activities as element(iati-activity)* ,$query as element(query))  as node()* {
 let $count := count($group-activities)
 where $count > 0
@@ -343,52 +271,19 @@ return
        }
 };
 
-(: this function starts from the olap code list - its the fastest approach  :)
+(: this function starts from the olap code list - its the fastest approach  - better than doing distinct-values
 
+This generic version is slightly slower than a hard-coded version :)
 
-declare function api:group-by-country($query  as element(query),$activities as element(iati-activity)*)  {
-let $facet := "Country"
-for $group in olap:facet($query/corpus,$facet)
-let $group-activities :=  $activities[recipient-country/@iati-ad:country eq $group/code]
-return 
-  api:group-summary($facet,$group,$group-activities,$query)
+declare function api:group-by-facet($query  as element(query), $facet-name as xs:string, $activities as element(iati-activity)*)  {
+let $facet := olap:meta-facet($query/corpus,$facet-name) 
+let $exp := concat("$activities[",$facet/@element,"/",$facet/@path," eq $group/code]")
+for $group in olap:facet($query/corpus,$facet-name)
+let $group-activities :=  util:eval($exp,true())
+return
+    api:group-summary($facet-name,$group,$group-activities,$query)
 };
 
-declare function api:group-by-region($query  as element(query),$activities as element(iati-activity)*)  {
-let $facet := "Region"
-for $group in olap:facet($query/corpus,$facet)
-let $group-activities :=  $activities[recipient-region/@iati-ad:region eq $group/code]
-return 
-   api:group-summary($facet,$group,$group-activities,$query)
-};
-
-declare function api:group-by-funder($query  as element(query),$activities as element(iati-activity)*)  {
-let $facet := "Funder"
-for $group in olap:facet($query/corpus,$facet)
-let $group-activities :=  $activities[participating-org/@iati-ad:funder eq $group/code]
-return 
-   api:group-summary($facet,$group,$group-activities,$query)
-};
-
-declare function api:group-by-sector($query  as element(query),$activities as element(iati-activity)*)  {
-let $facet := "Sector"
-for $group in olap:facet($query/corpus,$facet)
-let $group-activities :=  $activities[sector/@iati-ad:sector eq $group/code]
-return 
-   api:group-summary($facet,$group,$group-activities,$query)
-};
-
-declare function api:group-by-category($query  as element(query),$activities as element(iati-activity)*)  {
-let $facet := "SectorCategory"
-for $group in olap:facet($query/corpus,$facet)
-let $group-activities :=  $activities[sector/@iati-ad:category eq $group/code]
-return 
-   api:group-summary($facet,$group,$group-activities,$query)
-};
-
-(: fetch summary results from the olap cache if it is suitable
-
-:)
 
 declare function api:query-olap($query) {
 let $olap := olap:facet($query/corpus ,"Corpus")
@@ -658,17 +553,7 @@ declare function api:select-groups($query) {
               return
                   if ($query/groupby eq "All")
                   then api:group-by-all($query,$selected-activities)
-                  else  if ($query/groupby eq "Country")
-                  then api:group-by-country($query,$selected-activities)
-                  else if ($query/groupby eq "Region")
-                  then api:group-by-region($query,$selected-activities)
-                  else if ($query/groupby eq "SectorCategory")
-                  then api:group-by-category($query,$selected-activities)
-                  else if ($query/groupby eq "Sector")
-                  then api:group-by-sector($query,$selected-activities)
-                  else if ($query/groupby eq "Funder")
-                  then api:group-by-funder($query,$selected-activities)
-                  else ()
+                  else  api:group-by-facet($query,$query/groupby,$selected-activities)
                   
    let $selected-groups :=
         if (empty($selected-groups)) then ()
